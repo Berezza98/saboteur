@@ -1,0 +1,19 @@
+@font-face {
+  font-family: 'Kronika';
+  src: url(../fonts/kronika.ttf);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  width: 100%;
+}
+
+.fontPreload {
+  position: absolute;
+  left: 100%;
+  font-family: 'Kronika';
+}
