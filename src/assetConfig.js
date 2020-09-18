@@ -3,12 +3,15 @@ import cards from './assets/sprites/cards.png';
 
 import { ASSETS_NAMES } from './constants';
 
-export const mainAssets = [
+export const bootAssets = [
   {
     name: ASSETS_NAMES.mainBg,
     type: 'image',
     src: bg
   },
+];
+
+export const mainAssets = [
   {
     name: ASSETS_NAMES.card,
     type: 'spritesheet',

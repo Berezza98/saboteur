@@ -2,26 +2,63 @@ import Scene from '../custom/Scene';
 import Card from '../gameObjects/Card';
 import GameField from '../gameObjects/GameField';
 import DragZoomScene from '../custom/DragZoomScene';
-
+import { ASSETS_NAMES, CARD_NAMES, MAIN_SCENE } from '../constants';
+import CustomCamera from '../custom/CustomCamera';
+import Cell from '../gameObjects/Cell';
 import { mainAssets } from '../assetConfig';
-import { ASSETS_NAMES, CARD_NAMES } from '../constants';
 
 export default class MainScene extends Scene {
   constructor() {
-    super('Main');
-    this.gameField = new GameField(this);
+    super(MAIN_SCENE);
   }
 
-  preloadAssets = mainAssets;
-
   create() {
-    this.scene.add('LittleScene', new DragZoomScene(), true);
+    const { width, height } = this.sys.game.config;
     this.createBackground();
     this.createGnomeCard();
     this.createCardDeck();
-    this.gameField.render();
+    // this.scene.add('DragZoomScene', new DragZoomScene({
+    //   x: width / 2,
+    //   y: height / 2,
+    //   height: 800,
+    //   width: 1200
+    // }), true);
+    const g = this.add.graphics();
+    g.lineStyle(2, 0xdd0000);
+    g.strokeRect(width / 2 - 500, height / 2 - 400, 1000, 800);
+    // this.scene.add('GameField', new GameField({
+    //   x: width / 2,
+    //   y: height / 2,
+    //   height: 800,
+    //   width: 1000,
+    // }), true);
     this.createOwnCards();
     this.createTexts();
+
+    // this.makeGraphics();
+    // this.makeContent();
+    // this.camera1 = new CustomCamera(this, {
+    //   x: 50,
+    //   y: 50,
+    //   width: 300,
+    //   height: 500,
+    //   scrollX: width,
+    //   scrollY: height,
+    // });
+  };
+
+  makeGraphics() {
+    const g = this.add.graphics();
+    g.lineStyle(2, 0xdd0000);
+    g.strokeRect(45, 45, 310, 510);
+    g.fillStyle(0xdd0000, 1);
+    g.fillTriangle(80, 290, 80, 310, 120, 300);
+    g.fillTriangle(320, 290, 320, 310, 280, 300);
+  };
+
+  makeContent() {
+    const { width, height } = this.sys.game.config;
+    new Cell(this, { x: width, y: height }).setOrigin(0);
   };
 
   createTexts() {
@@ -67,11 +104,6 @@ export default class MainScene extends Scene {
       fill: '#ffffff',
     }).setOrigin(0.5, 0.5);
   }
-
-  createGameField() {
-    
-    
-  };
 
   createOwnCards() {
     const { frameWidth, frameHeight } = mainAssets.find(obj => obj.name === ASSETS_NAMES.card).options;

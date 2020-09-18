@@ -3,14 +3,23 @@ import Scene from './Scene';
 import codeImg from '../assets/sprites/code.png';
 
 export default class DragZoomScene extends Scene {
-  constructor() {
+  constructor(options) {
     super('LittleScene');
-    this.x = 0;
-    this.y = 0;
-    this.height = 1000;
-    this.width = 1000;
+    const defaultOptions = {
+      x: 0,
+      y: 0,
+      height: 1000,
+      width: 1000
+    };
+    const { x, y, height, width } = Object.assign(defaultOptions, options);
+    this.x = x;
+    this.y = y;
+    this.height = height;
+    this.width = width;
     this.minZoom = 0.5;
     this.maxZoom = 2;
+    this.totalWidth = this.width * this.bgCoef;
+    this.totalHeight = this.height * this.bgCoef;
   };
 
   preloadAssets = [
@@ -40,23 +49,32 @@ export default class DragZoomScene extends Scene {
   }
 
   create() {
-    const { x, y, bgCoef, height, width } = this;
-    const totalWidth = width * bgCoef;
-    const totalHeight = height * bgCoef;
-    this.rect = new Phaser.Geom.Rectangle(x, y, width, height);
-    this.camera.setViewport(x, y, width, height);
-    this.camera.setOrigin(0.5);
-    this.camera.centerOn(totalWidth / 2, totalHeight / 2);
-    this.camera.setBackgroundColor('rgba(255,0,0,0.3)');
-    this.camera.setBounds(0, 0, totalWidth, totalHeight);
-    this.add.image(totalWidth / 2, totalHeight / 2, 'code');
+    this.setCameraOptions();
+    this.createUI();
     this.cursors = this.input.keyboard.createCursorKeys();
     this.addListeners();
   };
 
+  setCameraOptions() {
+    const { x, y, height, width, totalWidth, totalHeight } = this;
+    const correctX = x - width / 2;
+    const correctY = y - height / 2;
+    this.rect = new Phaser.Geom.Rectangle(correctX, correctY, width, height);
+    this.camera.setViewport(correctX, correctY, width, height);
+    this.camera.setOrigin(0.5);
+    this.camera.centerOn(totalWidth / 2, totalHeight / 2);
+    // this.camera.setBackgroundColor('rgba(255,0,0,0.3)');
+    this.camera.setBounds(0, 0, totalWidth, totalHeight);
+  };
+
+  createUI() {
+    const { totalWidth, totalHeight } = this;
+    this.add.image(totalWidth / 2, totalHeight / 2, 'code');
+  };
+
   isOver(pointer) {
       return this.rect.contains(pointer.x, pointer.y);
-  }
+  };
 
   addListeners() {
     this.input.on('wheel', (pointer, el, deltaX, deltaY) => {

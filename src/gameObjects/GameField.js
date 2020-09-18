@@ -1,18 +1,18 @@
 import Cell from '../gameObjects/Cell';
 import { mainAssets } from '../assetConfig';
 import { ASSETS_NAMES, START_FIELD_STATE } from '../constants';
+import DragZoomScene from '../custom/DragZoomScene';
 
-export default class GameField {
-  constructor(scene) {
+export default class GameField extends DragZoomScene {
+  constructor(x, y) {
+    super(x, y);
     this.elements = [];
     this.startCardPos = [2, 0];
-    this.scene = scene;
     this.gameField = {
       rows: 5,
       columns: 9,
     };
     this.cellMargin = 5;
-    this.topMargin = 170;
   };
 
   get countRows() {
@@ -28,7 +28,7 @@ export default class GameField {
     const { x, y } = this.elements[0][0];
     const newRow = [];
     for(let i = 0; i < this.countColumns; i++) {
-      newRow.push(new Cell(this.scene, {
+      newRow.push(new Cell(this, {
         x: x + (frameWidth + this.cellMargin) * i,
         y: y - frameHeight - this.cellMargin
       }));
@@ -41,7 +41,7 @@ export default class GameField {
     const { x, y } = this.elements[this.elements.length - 1][0];
     const newRow = [];
     for(let i = 0; i < this.countColumns; i++) {
-      newRow.push(new Cell(this.scene, {
+      newRow.push(new Cell(this, {
         x: x + (frameWidth + this.cellMargin) * i,
         y: y + frameHeight + this.cellMargin
       }));
@@ -53,7 +53,7 @@ export default class GameField {
     const { frameWidth, frameHeight } = mainAssets.find(obj => obj.name === ASSETS_NAMES.card).options;
     this.elements.forEach(row => {
       const { x, y } = row[row.length - 1];
-      row.push(new Cell(this.scene, {
+      row.push(new Cell(this, {
         x: x + frameWidth + this.cellMargin,
         y
       }));
@@ -64,7 +64,7 @@ export default class GameField {
     const { frameWidth, frameHeight } = mainAssets.find(obj => obj.name === ASSETS_NAMES.card).options;
     this.elements.forEach(row => {
       const { x, y } = row[0];
-      row.unshift(new Cell(this.scene, {
+      row.unshift(new Cell(this, {
         x: x - frameWidth - this.cellMargin,
         y
       }));
@@ -75,25 +75,27 @@ export default class GameField {
     return Object.values(START_FIELD_STATE).find(el => el.x === x && el.y === y);
   };
 
-  render() {
+  createUI() {
     const { frameWidth, frameHeight } = mainAssets.find(obj => obj.name === ASSETS_NAMES.card).options;
-    const { width, height } = this.scene.sys.game.config;
+    const { width, height } = this;
     const { rows, columns } = this.gameField;
-    const diffX = ((width - (columns * (frameWidth + this.cellMargin ))) / 2) + frameWidth / 2;
+    const container = this.add.container(width / 2, height / 2);
 
     for(let row = 0; row < rows; row++){
       this.elements[row] = [];
       for(let col = 0; col < columns; col++){
         const pos = {
-          x: col * (frameWidth + this.cellMargin) + diffX,
-          y: row * (frameHeight + this.cellMargin) + this.topMargin,
+          x: col * (frameWidth + this.cellMargin),
+          y: row * (frameHeight + this.cellMargin),
         };
-        const cell = new Cell(this.scene, pos);
+        const cell = new Cell(this, pos);
+        container.add(cell);
         this.elements[row][col] = cell;
         if (this.findActiveCell(col, row)) {
           cell.visible = true;
         }
-      } 
+      }
+      console.log(container);
     }
   };
 };

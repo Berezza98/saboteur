@@ -1,3 +1,8 @@
+export const BOOT_SCENE = 'Boot';
+export const PRELOAD_SCENE = 'Preload';
+export const MENU_SCENE = 'Menu';
+export const MAIN_SCENE = 'Main';
+
 export const ASSETS_NAMES = {
   mainBg: 'bg',
   card: 'card',
