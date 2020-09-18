@@ -1,26 +1,17 @@
 import { Cameras } from "phaser";
 
-export default class CustomCamera extends Cameras.Scene2D.Camera {
-  constructor(scene, {
-    x,
-    y,
-    width,
-    height,
-    scrollX,
-    scrollY
-  }) {
+export default class DragZoomCamera extends Cameras.Scene2D.Camera {
+  constructor(scene, x, y, width, height, cameraBounds) {
     super(x, y, width, height);
     this.scene = scene;
     this.x = x;
     this.y = y;
-    this.width = width || this.scene.game.config.width;
-    this.height = height || this.scene.game.config.height;
+    this.width = width;
+    this.height = height;
     this.minZoom = 0.5;
     this.maxZoom = 2;
-    // this.scrollY = scrollX;
-    // this.scrollX = scrollY;
-    this.setViewport(0,0, 500, 500)
-
+    this.setBounds(cameraBounds.x - cameraBounds.width / 2, cameraBounds.y - cameraBounds.height / 2, cameraBounds.width * 2, cameraBounds.height * 2);
+    this.setScroll(cameraBounds.x, cameraBounds.y);
     this.init();
   };
 
@@ -38,9 +29,8 @@ export default class CustomCamera extends Cameras.Scene2D.Camera {
   };
 
   init() {
-    console.log(this.scrollY, this.scrollX);
     this._rectangle = new Phaser.Geom.Rectangle(this.x, this.y, this.width, this.height);
-    this.setDragEvent();
+    this.setZoomDragEvent();
 
     this.scene.cameras.addExisting(this);
   };
@@ -49,14 +39,13 @@ export default class CustomCamera extends Cameras.Scene2D.Camera {
     return this._rectangle.contains(pointer.x, pointer.y);
   };
 
-  setDragEvent() {
+  setZoomDragEvent() {
     this.scene.input.on('wheel', (pointer, el, deltaX, deltaY) => {
       if (this.isOver(pointer)) {
-        console.log('zoom: ', this.zoom, deltaY);
         const changeValue = this.zoom + deltaY * 0.001;
-        if (changeValue >= this.minZoom && changeValue <= this.maxZoom) {
+        // if (changeValue >= this.minZoom && changeValue <= this.maxZoom) {
           this.zoom = changeValue;
-        }
+        // }
       }
     });
   
@@ -69,7 +58,6 @@ export default class CustomCamera extends Cameras.Scene2D.Camera {
 
     this.scene.input.on('pointermove', (pointer, gameObjects) => {
       if (this.isDown && this.isOver(pointer)) {
-        console.log('Move');
         const { zoom } = this;
         this.scrollY += (this.initPos.y - pointer.y) / zoom;
         this.scrollX += (this.initPos.x - pointer.x) / zoom;

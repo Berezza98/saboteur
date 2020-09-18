@@ -2,8 +2,8 @@ import Scene from '../custom/Scene';
 import Card from '../gameObjects/Card';
 import GameField from '../gameObjects/GameField';
 import DragZoomScene from '../custom/DragZoomScene';
+import DragZoomCamera from '../custom/DragZoomCamera'
 import { ASSETS_NAMES, CARD_NAMES, MAIN_SCENE } from '../constants';
-import CustomCamera from '../custom/CustomCamera';
 import Cell from '../gameObjects/Cell';
 import { mainAssets } from '../assetConfig';
 
@@ -13,52 +13,55 @@ export default class MainScene extends Scene {
   }
 
   create() {
-    const { width, height } = this.sys.game.config;
     this.createBackground();
     this.createGnomeCard();
     this.createCardDeck();
-    // this.scene.add('DragZoomScene', new DragZoomScene({
-    //   x: width / 2,
-    //   y: height / 2,
-    //   height: 800,
-    //   width: 1200
-    // }), true);
-    const g = this.add.graphics();
-    g.lineStyle(2, 0xdd0000);
-    g.strokeRect(width / 2 - 500, height / 2 - 400, 1000, 800);
-    // this.scene.add('GameField', new GameField({
-    //   x: width / 2,
-    //   y: height / 2,
-    //   height: 800,
-    //   width: 1000,
-    // }), true);
+    this.addGameField();
+    console.log(this.gameField);
     this.createOwnCards();
     this.createTexts();
-
-    // this.makeGraphics();
-    // this.makeContent();
-    // this.camera1 = new CustomCamera(this, {
-    //   x: 50,
-    //   y: 50,
-    //   width: 300,
-    //   height: 500,
-    //   scrollX: width,
-    //   scrollY: height,
-    // });
   };
 
-  makeGraphics() {
-    const g = this.add.graphics();
-    g.lineStyle(2, 0xdd0000);
-    g.strokeRect(45, 45, 310, 510);
-    g.fillStyle(0xdd0000, 1);
-    g.fillTriangle(80, 290, 80, 310, 120, 300);
-    g.fillTriangle(320, 290, 320, 310, 280, 300);
-  };
-
-  makeContent() {
+  addGameField() {
     const { width, height } = this.sys.game.config;
-    new Cell(this, { x: width, y: height }).setOrigin(0);
+
+    this.gameField = new GameField(this, 0, height);
+
+    const cameraBounds = {
+      x: this.gameField.topLeftPos.x,
+      y: this.gameField.topLeftPos.y + height,
+      width: this.gameField.size.width,
+      height: this.gameField.size.height
+    };
+
+    this.dragZoomCamera = new DragZoomCamera(
+      this,
+      width / 2 - this.gameField.size.width / 2,
+      height / 2 - this.gameField.size.height / 2,
+      this.gameField.size.width,
+      this.gameField.size.height,
+      cameraBounds
+    );
+
+    this.createFieldFrame();
+
+    const g = this.add.graphics();
+    g.fillStyle(0xffffff, 1);
+    g.fillPoint(this.gameField.topLeftPos.x, this.gameField.topLeftPos.y + height, 100);
+    g.fillPoint(this.gameField.bottomRightPos.x, this.gameField.bottomRightPos.y + height, 100);
+  };
+
+  createFieldFrame() {
+    const { width, height } = this.sys.game.config;
+    const { size } = this.gameField;
+    const g = this.add.graphics();
+    g.lineStyle(5, 0xffffff, 0.6);
+    g.strokeRect(
+      width / 2 - size.width / 2,
+      height / 2 - size.height / 2,
+      size.width,
+      size.height
+    );
   };
 
   createTexts() {

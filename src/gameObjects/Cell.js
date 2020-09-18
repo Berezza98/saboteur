@@ -6,7 +6,8 @@ export default class Cell extends GameObjects.Sprite {
   constructor(scene, { x, y }) {
     super(scene, x, y, ASSETS_NAMES.card, CARD_NAMES.empty);
     this.active = true;
-    this.visible = false;
+    // this.visible = false;
+    this.setOrigin(0, 0);
     this.scene.add.existing(this);
   };
 
@@ -26,18 +27,16 @@ export default class Cell extends GameObjects.Sprite {
   }
 
   onDragEnter() {
-    this.changeScale(1.2);
     this.setTint(0x00ff00);
   };
 
   async onDragLeave() {
-    await this.changeScale(1);
     this.clearTint();
   };
 
   async onDrop({ texture: { key }, frame: { name } }) {
     this.active = false;
-    await this.onDragLeave(1);
+    await this.onDragLeave();
     this.setTexture(key, name);
   };
 
