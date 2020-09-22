@@ -1,10 +1,8 @@
 import Scene from '../custom/Scene';
 import Card from '../gameObjects/Card';
 import GameField from '../gameObjects/GameField';
-import DragZoomScene from '../custom/DragZoomScene';
 import DragZoomCamera from '../custom/DragZoomCamera'
 import { ASSETS_NAMES, CARD_NAMES, MAIN_SCENE } from '../constants';
-import Cell from '../gameObjects/Cell';
 import { mainAssets } from '../assetConfig';
 
 export default class MainScene extends Scene {
@@ -17,7 +15,6 @@ export default class MainScene extends Scene {
     this.createGnomeCard();
     this.createCardDeck();
     this.addGameField();
-    console.log(this.gameField);
     this.createOwnCards();
     this.createTexts();
   };
@@ -45,10 +42,10 @@ export default class MainScene extends Scene {
 
     this.createFieldFrame();
 
-    const g = this.add.graphics();
-    g.fillStyle(0xffffff, 1);
-    g.fillPoint(this.gameField.topLeftPos.x, this.gameField.topLeftPos.y + height, 100);
-    g.fillPoint(this.gameField.bottomRightPos.x, this.gameField.bottomRightPos.y + height, 100);
+    // const g = this.add.graphics();
+    // g.fillStyle(0xffffff, 1);
+    // g.fillPoint(this.gameField.topLeftPos.x, this.gameField.topLeftPos.y + height, 100);
+    // g.fillPoint(this.gameField.bottomRightPos.x, this.gameField.bottomRightPos.y + height, 100);
   };
 
   createFieldFrame() {

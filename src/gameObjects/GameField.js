@@ -8,7 +8,6 @@ export default class GameField extends GameObjects.Container {
     super(scene, x, y);
     this.scene = scene;
     this.elements = [];
-    this.startCardPos = [2, 0];
     this.gameField = {
       rows: 5,
       columns: 9,
@@ -41,7 +40,6 @@ export default class GameField extends GameObjects.Container {
   };
 
   get bottomRightPos() {
-    console.log(this.countRows - 1, this.countColumns - 1);
     const { x, y, height, width } = this.elements[this.countRows - 1][this.countColumns - 1];
     return {
       x: x + width,
@@ -56,53 +54,108 @@ export default class GameField extends GameObjects.Container {
     };
   };
 
-  // addFirstRow() {
-  //   const { frameWidth, frameHeight } = mainAssets.find(obj => obj.name === ASSETS_NAMES.card).options;
-  //   const { x, y } = this.elements[0][0];
-  //   const newRow = [];
-  //   for(let i = 0; i < this.countColumns; i++) {
-  //     newRow.push(new Cell(this, {
-  //       x: x + (frameWidth + this.cellMargin) * i,
-  //       y: y - frameHeight - this.cellMargin
-  //     }));
-  //   }
-  //   this.elements.push(newRow);
-  // };
+  findCellPos(cell) {
+    let col;
+    const row = this.elements.findIndex(row => {
+      col = row.findIndex(col => col === cell);
+      return col >= 0;
+    });
+    return {
+      row,
+      col
+    };
+  };
 
-  // addLastRow() {
-  //   const { frameWidth, frameHeight } = mainAssets.find(obj => obj.name === ASSETS_NAMES.card).options;
-  //   const { x, y } = this.elements[this.elements.length - 1][0];
-  //   const newRow = [];
-  //   for(let i = 0; i < this.countColumns; i++) {
-  //     newRow.push(new Cell(this, {
-  //       x: x + (frameWidth + this.cellMargin) * i,
-  //       y: y + frameHeight + this.cellMargin
-  //     }));
-  //   }
-  //   this.elements.push(newRow);
-  // };
+  activateFieldsAround(cell) {
+    this.addNewCells(cell);
+  
+    const { row, col } = this.findCellPos(cell);
 
-  // addLastCol() {
-  //   const { frameWidth, frameHeight } = mainAssets.find(obj => obj.name === ASSETS_NAMES.card).options;
-  //   this.elements.forEach(row => {
-  //     const { x, y } = row[row.length - 1];
-  //     row.push(new Cell(this, {
-  //       x: x + frameWidth + this.cellMargin,
-  //       y
-  //     }));
-  //   });
-  // };
+    this.elements[row][col + 1].visible = true;
+    this.elements[row][col - 1].visible = true;
+    this.elements[row - 1][col].visible = true;
+    this.elements[row + 1][col].visible = true;
+  };
 
-  // addFirstCol() {
-  //   const { frameWidth, frameHeight } = mainAssets.find(obj => obj.name === ASSETS_NAMES.card).options;
-  //   this.elements.forEach(row => {
-  //     const { x, y } = row[0];
-  //     row.unshift(new Cell(this, {
-  //       x: x - frameWidth - this.cellMargin,
-  //       y
-  //     }));
-  //   });
-  // };
+  addNewCells(cell) {
+    const { row, col } = this.findCellPos(cell);
+
+    if (!this.elements[row][col + 1]) {
+      this.addLastCol();
+    }
+    if (!this.elements[row][col - 1]) {
+      this.addFirstCol();
+      console.log(this);
+      console.log('first col was added');
+    }
+    if (!this.elements[row - 1]) {
+      this.addFirstRow();
+    }
+    if (!this.elements[row + 1]) {
+      this.addLastRow();
+    }
+  };
+
+  addFirstRow() {
+    const { frameWidth, frameHeight } = mainAssets.find(obj => obj.name === ASSETS_NAMES.card).options;
+    const { x, y } = this.elements[0][0];
+    const newRow = [];
+    for(let i = 0; i < this.countColumns; i++) {
+      const pos = {
+        x: x + (frameWidth + this.cellMargin) * i,
+        y: y - frameHeight - this.cellMargin
+      };
+      const cell = new Cell(this.scene, this, pos);
+      newRow.push(cell);
+      this.add(cell);
+    }
+    this.elements.unshift(newRow);
+  };
+
+  addLastRow() {
+    const { frameWidth, frameHeight } = mainAssets.find(obj => obj.name === ASSETS_NAMES.card).options;
+    const { x, y } = this.elements[this.elements.length - 1][0];
+    const newRow = [];
+    for(let i = 0; i < this.countColumns; i++) {
+      const pos = {
+        x: x + (frameWidth + this.cellMargin) * i,
+        y: y + frameHeight + this.cellMargin
+      };
+      const cell = new Cell(this.scene, this, pos);
+      newRow.push(cell);
+      this.add(cell);
+    }
+    this.elements.push(newRow);
+  };
+
+  addLastCol() {
+    const { frameWidth, frameHeight } = mainAssets.find(obj => obj.name === ASSETS_NAMES.card).options;
+    this.elements.forEach(row => {
+      const { x, y } = row[row.length - 1];
+      const pos = {
+        x: x + frameWidth + this.cellMargin,
+        y
+      };
+      const cell = new Cell(this.scene, this, pos);
+      row.push(cell);
+      this.add(cell);
+    });
+    console.log(this.elements);
+  };
+
+  addFirstCol() {
+    const { frameWidth, frameHeight } = mainAssets.find(obj => obj.name === ASSETS_NAMES.card).options;
+    this.elements.forEach(row => {
+      const { x, y } = row[0];
+      const pos = {
+        x: x - frameWidth - this.cellMargin,
+        y
+      };
+      const cell = new Cell(this.scene, this, pos);
+      row.unshift(cell);
+      this.add(cell);
+    });
+  };
 
   findActiveCell(x, y) {
     return Object.values(START_FIELD_STATE).find(el => el.x === x && el.y === y);
@@ -119,7 +172,11 @@ export default class GameField extends GameObjects.Container {
           x: col * (frameWidth + this.cellMargin) + this.marginLeft,
           y: row * (frameHeight + this.cellMargin) + this.marginTop,
         };
-        const cell = new Cell(this.scene, pos);
+        const fieldPos = {
+          row,
+          col
+        };
+        const cell = new Cell(this.scene, this, pos, fieldPos);
         this.add(cell);
         this.elements[row][col] = cell;
         if (this.findActiveCell(col, row)) {

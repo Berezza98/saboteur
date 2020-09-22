@@ -3,10 +3,11 @@ import { GameObjects } from 'phaser';
 import { ASSETS_NAMES, CARD_NAMES } from '../constants';
 
 export default class Cell extends GameObjects.Sprite {
-  constructor(scene, { x, y }) {
+  constructor(scene, gameField, { x, y }) {
     super(scene, x, y, ASSETS_NAMES.card, CARD_NAMES.empty);
+    this.gameField = gameField;
     this.active = true;
-    // this.visible = false;
+    this.visible = false;
     this.setOrigin(0, 0);
     this.scene.add.existing(this);
   };
@@ -24,7 +25,7 @@ export default class Cell extends GameObjects.Sprite {
     } else {
       this.disableInteractive();
     }
-  }
+  };
 
   onDragEnter() {
     this.setTint(0x00ff00);
@@ -38,6 +39,7 @@ export default class Cell extends GameObjects.Sprite {
     this.active = false;
     await this.onDragLeave();
     this.setTexture(key, name);
+    this.gameField.activateFieldsAround(this);
   };
 
   changeScale(scale) {

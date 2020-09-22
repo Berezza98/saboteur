@@ -43,9 +43,9 @@ export default class DragZoomCamera extends Cameras.Scene2D.Camera {
     this.scene.input.on('wheel', (pointer, el, deltaX, deltaY) => {
       if (this.isOver(pointer)) {
         const changeValue = this.zoom + deltaY * 0.001;
-        // if (changeValue >= this.minZoom && changeValue <= this.maxZoom) {
+        if (changeValue >= this.minZoom && changeValue <= this.maxZoom) {
           this.zoom = changeValue;
-        // }
+        }
       }
     });
   

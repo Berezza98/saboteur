@@ -1,6 +1,7 @@
 import Scene from "../custom/Scene";
 import { mainAssets } from '../assetConfig';
 import { PRELOAD_SCENE, MENU_SCENE, ASSETS_NAMES } from '../constants';
+import LoadingBar from '../gameObjects/LoadingBar';
 
 export default class PreloadScene extends Scene {
   constructor() {
@@ -8,6 +9,11 @@ export default class PreloadScene extends Scene {
   };
 
   preloadAssets = mainAssets;
+
+  preload() {
+    super.preload();
+    new LoadingBar(this);
+  };
 
   init() {
     this.createBackground();
